@@ -1,0 +1,4 @@
+# audit-trigger extension
+comment = 'A simple, customisable table audit system'
+default_version = '0.1.0'
+module_pathname = '$libdir/audit_trigger'

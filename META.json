@@ -1,0 +1,46 @@
+{
+   "name": "audit_trigger",
+   "abstract": "Table audit system",
+   "description": "A simple, customisable table audit system for PostgreSQL implemented using triggers.",
+   "version": "0.1.0",
+   "maintainer": [
+      "2nd Quadrant <info@2ndquadrant.com>"
+   ],
+   "license": "postgresql",
+   "provides": {
+      "audit_trigger": {
+         "abstract": "Table audit system",
+         "file": "sql/audit.sql",
+         "docfile": "doc/audit.md",
+         "version": "0.1.0"
+      }
+   },
+   "prereqs": {
+      "runtime": {
+         "requires": {
+            "PostgreSQL": "10.0"
+         }
+      }
+   },
+   "resources": {
+      "bugtracker": {
+         "web": "https://github.com/2ndQuadrant/audit-trigger/issues/"
+      },
+      "repository": {
+        "url":  "git://github.com/2ndQuadrant/audit-trigger.git",
+        "web":  "https://github.com/2ndQuadrant/audit-trigger/",
+        "type": "git"
+      }
+   },
+   "generated_by": "Michel Luiz Milezzi",
+   "meta-spec": {
+      "version": "1.0.0",
+      "url": "http://pgxn.org/meta/spec.txt"
+   },
+   "tags": [
+      "audit",
+      "trigger",
+      "trace",
+      "cdc"
+   ]
+}
