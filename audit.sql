@@ -12,6 +12,8 @@
 --
 -- Should really be converted into a relocatable EXTENSION, with control and upgrade files.
 
+CREATE EXTENSION IF NOT EXISTS hstore;
+
 CREATE SCHEMA audit;
 REVOKE ALL ON SCHEMA audit FROM public;
 
@@ -120,23 +122,17 @@ BEGIN
     END IF;
     
     IF (TG_OP = 'UPDATE' AND TG_LEVEL = 'ROW') THEN
-        audit_row.row_data = row_to_json(OLD)::JSONB - excluded_cols;
-        
-        --Computing differences
-		SELECT 
-			jsonb_object_agg(tmp_new_row.key, tmp_new_row.value) AS new_data
-			INTO audit_row.changed_fields
-		FROM jsonb_each_text(row_to_json(NEW)::JSONB) AS tmp_new_row 
-		    JOIN jsonb_each_text(audit_row.row_data) AS tmp_old_row ON (tmp_new_row.key = tmp_old_row.key AND tmp_new_row.value IS DISTINCT FROM tmp_old_row.value);
-        
+        audit_row.row_data = to_jsonb(OLD) - excluded_cols;
+        audit_row.changed_fields = to_jsonb((hstore(NEW.*) - hstore(OLD.*)) - excluded_cols);
+
         IF audit_row.changed_fields = '{}'::JSONB THEN
             -- All changed fields are ignored. Skip this update.
             RETURN NULL;
         END IF;
     ELSIF (TG_OP = 'DELETE' AND TG_LEVEL = 'ROW') THEN
-        audit_row.row_data = row_to_json(OLD)::JSONB - excluded_cols;
+        audit_row.row_data = to_jsonb(OLD) - excluded_cols;
     ELSIF (TG_OP = 'INSERT' AND TG_LEVEL = 'ROW') THEN
-        audit_row.row_data = row_to_json(NEW)::JSONB - excluded_cols;
+        audit_row.row_data = to_jsonb(NEW) - excluded_cols;
     ELSIF (TG_LEVEL = 'STATEMENT' AND TG_OP IN ('INSERT','UPDATE','DELETE','TRUNCATE')) THEN
         audit_row.statement_only = 't';
     ELSE
